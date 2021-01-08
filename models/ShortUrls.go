@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -25,7 +26,14 @@ type ShortUrls struct {
 
 func init() {
 	orm.Debug = true // 是否开启调试模式 调试模式下会打印出sql语句
-	orm.RegisterDataBase("default", "mysql", "root:root@tcp(127.0.0.1:3306)/json?charset=utf8&parseTime=True&loc=Local", 30)
+
+	mysql_user := beego.AppConfig.String("mysqluser")
+	mysql_pass := beego.AppConfig.String("mysqlpass")
+	mysql_host := beego.AppConfig.String("mysqlhost")
+	mysql_port := beego.AppConfig.String("mysqlport")
+	mysql_db := beego.AppConfig.String("mysqldb")
+
+	orm.RegisterDataBase("default", "mysql", mysql_user+":"+mysql_pass+"@tcp("+mysql_host+":"+mysql_port+")/"+mysql_db+"?charset=utf8&parseTime=True&loc=Local", 30)
 	orm.RegisterModel(new(ShortUrls))
 }
 
@@ -44,7 +52,6 @@ func UpdateData(shor_urls *ShortUrls) int64 {
 	o := orm.NewOrm()
 
 	var Zero int64 = 0
-
 
 	num, err := o.Update(shor_urls)
 	if err == nil {

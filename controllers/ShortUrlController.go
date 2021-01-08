@@ -61,8 +61,6 @@ func (c *ShortUrlController) Post() {
 	}
 
 	l, _ := time.LoadLocation("Asia/Shanghai")
-	// 	fmt.Println(time.Now().In(l))
-
 	now := time.Now().In(l)
 	day_hour_num := day_num * 24
 

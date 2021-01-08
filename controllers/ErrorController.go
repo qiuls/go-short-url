@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"myproject/models"
+	"time"
 
 	"github.com/astaxie/beego"
 )
@@ -38,7 +39,7 @@ func (c *ErrorController) Error404() {
 		fmt.Println("______" + key)
 		c.Ctx.Redirect(302, url)
 	}
-	c.Data["content"] = "很抱歉您访问的地址或者方法不存在"
+	c.Data["content"] = "很抱歉您访问的地址不存在"
 	c.TplName = "error/404.tpl"
 }
 
@@ -60,6 +61,16 @@ func (c *ErrorController) FindByKey(key string) string {
 		return ""
 	}
 
+	l, _ := time.LoadLocation("Asia/Shanghai")
+	now := time.Now().In(l)
+
+	subM := now.Sub(short_url_model.Expire_at)
+
+	diff_num_minutes := subM.Minutes()
+	if diff_num_minutes > 1 {
+		fmt.Println("当前Url过期 " + short_url_model.Url)
+		return ""
+	}
 	var url = short_url_model.Url
 	return url
 }
