@@ -16,9 +16,9 @@ type ShortUrlController struct {
 }
 
 type ShortJsonReturn struct {
-	Code    int
-	Data    map[string]string
-	Message string
+	Code    int               `json:"code"`
+	Data    map[string]string `json:"data"`
+	Message string            `json:"message"`
 }
 
 func (c *ShortUrlController) returnJsonData(code int, message string, data map[string]string) bool {

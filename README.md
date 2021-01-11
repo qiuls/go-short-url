@@ -1,6 +1,10 @@
 # go-short-url
 go bee的缩短url服务
 
+redis 服务
+go  -u get github.com/go-redis
+
+
 host = 'http://host'
 
 # 短url设置url
