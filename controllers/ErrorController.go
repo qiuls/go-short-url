@@ -27,20 +27,45 @@ func (c *ErrorController) Error403() {
 }
 func (c *ErrorController) Error404() {
 
+	c.TplName = "error/404.tpl"
+	c.Data["content"] = "很抱歉您访问的地址不存在"
+
 	//判断404的方法是否存在
 	request_url := c.Ctx.Request.RequestURI
 
 	key := request_url[1:]
+
+	redis := NewRedisPool()
+
+	val, err := redis.Get(key).Result()
+
+	if err == nil {
+		if val == "" {
+			return
+		}
+		c.Ctx.Redirect(302, val)
+		return
+	}
 
 	//查询是否进行了短url功能
 	url := c.FindByKey(key)
 	if url != "" {
 		fmt.Println("______" + c.Ctx.Request.RequestURI)
 		fmt.Println("______" + key)
+
+		url_cache_second, _ := beego.AppConfig.Int64("so_url_cache_second")
+
+		err := redis.Set(key, url, time.Duration(url_cache_second)*time.Second).Err()
+		if err != nil {
+			fmt.Println("redis set error")
+			c.Ctx.WriteString("redis set error")
+			return
+		}
+
 		c.Ctx.Redirect(302, url)
+		return
 	}
-	c.Data["content"] = "很抱歉您访问的地址不存在"
-	c.TplName = "error/404.tpl"
+
 }
 
 func (c *ErrorController) Error500() {

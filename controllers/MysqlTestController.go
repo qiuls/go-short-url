@@ -43,13 +43,20 @@ func (c *MysqlTestController) TestJson() {
 	c.ServeJSON()
 }
 
-func newPool() *redis.Client {
+func NewRedisPool() *redis.Client {
+
+	redis_host := beego.AppConfig.String("redis_host")
+	redis_port := beego.AppConfig.String("redis_port")
+	redis_pass := beego.AppConfig.String("redis_pass")
+	redis_db, _ := beego.AppConfig.Int("redis_db")
+
+	add_r := redis_host + ":" + redis_port
 
 	Client := redis.NewClient(&redis.Options{
-		Addr:     "127.0.0.1:6379",
+		Addr:     add_r,
 		PoolSize: 1000,
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Password: redis_pass, // no password set
+		DB:       redis_db,   // use default DB
 
 		ReadTimeout:  time.Millisecond * time.Duration(100),
 		WriteTimeout: time.Millisecond * time.Duration(100),
@@ -66,25 +73,30 @@ func newPool() *redis.Client {
 }
 
 func (c *MysqlTestController) TestRedis() {
+
 	user_key := c.GetString("user_key")
 
 	if user_key == "" {
-		fmt.Printf("用户id[%d]参数出错", user_key)
+		c.Ctx.WriteString("用户参数出错")
 		return
 	}
 
-	redis := newPool()
-	err := redis.Set(user_key, "value", 1*time.Second).Err()
+	redis := NewRedisPool()
+	err := redis.Set(user_key, user_key, 1*time.Second).Err()
 	if err != nil {
 		fmt.Println("redis set error")
+		c.Ctx.WriteString("redis set error")
+		return
 	}
 
 	val, err := redis.Get(user_key).Result()
 
 	if err != nil {
 		fmt.Println("redis get error")
+		c.Ctx.WriteString(val)
 		return
 	}
-	fmt.Println(val)
 
+	fmt.Println(val)
+	c.Ctx.WriteString(val)
 }

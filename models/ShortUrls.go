@@ -35,6 +35,10 @@ func init() {
 
 	orm.RegisterDataBase("default", "mysql", mysql_user+":"+mysql_pass+"@tcp("+mysql_host+":"+mysql_port+")/"+mysql_db+"?charset=utf8&parseTime=True&loc=Local", 30)
 	orm.RegisterModel(new(ShortUrls))
+
+	orm.SetMaxIdleConns("default", 10)
+	orm.SetMaxOpenConns("default", 100)
+
 }
 
 func Test(shor_urls *ShortUrls) {
