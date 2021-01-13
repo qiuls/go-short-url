@@ -87,7 +87,9 @@ func (c *ShortUrlController) Post() {
 		return
 	}
 
-	var url = "http://127.0.0.1:8082/" + key
+	http_dom := beego.AppConfig.String("http_dom")
+
+	var url = http_dom + key
 
 	data_map["url"] = url
 	data_map["key"] = key
@@ -112,7 +114,9 @@ func (c *ShortUrlController) Get() {
 		return
 	}
 
-	var url = "http://127.0.0.1:8082/" + key
+	http_dom := beego.AppConfig.String("http_dom")
+
+	var url = http_dom + key
 
 	data_map["url"] = url
 	data_map["key"] = key
